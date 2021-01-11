@@ -114,6 +114,113 @@
           }
         }
       }
+    },
+    "serverless-graphql": {
+      "root": "apps/serverless-graphql",
+      "sourceRoot": "apps/serverless-graphql/src",
+      "projectType": "application",
+      "prefix": "serverless-graphql",
+      "schematics": {},
+      "architect": {
+        "build": {
+          "builder": "@flowaccount/nx-serverless:build",
+          "options": {
+            "outputPath": "dist/apps/serverless-graphql",
+            "package": "apps/serverless-graphql",
+            "serverlessConfig": "apps/serverless-graphql/serverless.yml",
+            "servicePath": "apps/serverless-graphql",
+            "tsConfig": "apps/serverless-graphql/tsconfig.app.json",
+            "provider": "aws",
+            "processEnvironmentFile": "env.json"
+          },
+          "configurations": {
+            "dev": {
+              "optimization": false,
+              "sourceMap": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/serverless-graphql/environment.ts",
+                  "with": "apps/serverless-graphql/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@flowaccount/nx-serverless:offline",
+          "options": {
+            "buildTarget": "serverless-graphql:build",
+            "config": "apps/serverless-graphql/serverless.yml",
+            "location": "dist/apps/serverless-graphql"
+          },
+          "configurations": {
+            "dev": {
+              "buildTarget": "serverless-graphql:build:dev"
+            },
+            "production": {
+              "buildTarget": "serverless-graphql:build:production"
+            }
+          }
+        },
+        "deploy": {
+          "builder": "@flowaccount/nx-serverless:deploy",
+          "options": {
+            "buildTarget": "serverless-graphql:build:production",
+            "config": "apps/serverless-graphql/serverless.yml",
+            "location": "dist/apps/serverless-graphql",
+            "package": "dist/apps/serverless-graphql"
+          }
+        },
+        "destroy": {
+          "builder": "@flowaccount/nx-serverless:destroy",
+          "options": {
+            "buildTarget": "serverless-graphql:build:production",
+            "config": "apps/serverless-graphql/serverless.yml",
+            "location": "dist/apps/serverless-graphql",
+            "package": "dist/apps/serverless-graphql"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "apps/serverless-graphql/tsconfig.app.json",
+              "apps/serverless-graphql/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!apps/serverless-graphql/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/serverless-graphql"],
+          "options": {
+            "jestConfig": "apps/serverless-graphql/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
     }
   },
   "cli": {
